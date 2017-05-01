@@ -46,8 +46,8 @@ public class GraphMaker {
 				firstNode -=1;
 				secondNode -=1;
 				getAdjacencyList().get(firstNode).add(secondNode);
-//				getAdjacencyList().get(secondNode).add(firstNode);
-			}
+				getAdjacencyList().get(secondNode).add(firstNode);
+				}
 			return graph;
 		}catch (FileNotFoundException e) {
 			System.out.println("File Not Found");
@@ -56,14 +56,14 @@ public class GraphMaker {
 		return null;
 	}
 
-	public int getOutDegree(int v){
-		return (adjacencyList.get(v-1)).size();
+	public int getOutDegree(int n){ //gets how many edges V contains
+		return (adjacencyList.get(n-1)).size();
 	}
 
-	public int getInDegree(int v){
+	public int getInDegree(int n){ //gets number of nodes that have edged connected to V
 		int count = 0;
 		for(int x = 0; x < getNodes(); x++){
-			if(adjacencyList.get(x).contains(v)){
+			if(adjacencyList.get(x).contains(n)){
 				count++;
 			}
 		}
@@ -71,15 +71,47 @@ public class GraphMaker {
 	}
 
 	public void removeNode(int x){
-		for(int V = 0; V < getNodes(); V++){
-			if(adjacencyList.get(V).contains(x)){
-			
+		for(int n = 0; n < getNodes(); n++){
+			if(adjacencyList.get(n).contains(x)){//removes all edges to x
+				int index = adjacencyList.get(n).indexOf(x);
+				adjacencyList.get(n).remove(index);
 			}
 		}
-
-		setNodes(getNodes()-1);
+		int sizeOfRemove = adjacencyList.get(x).size();
+		for(int y = sizeOfRemove-1; y >= 0; y--){//"removes" x from graph. Just cuts all connections
+			adjacencyList.get(x).remove(y);
+		}
 	}
 
+	public void greedyRemove(){
+		int numRemove = this.removeNodes;
+		int[] removedNums = new int[numRemove];
+		int counter = 0;
+		while (numRemove >0){
+			int mostNodes = 0;
+			int numContained = -1;
+			for(int x = 0; x<getNodes(); x++){
+				if(adjacencyList.get(x).size() >= mostNodes){
+					mostNodes = adjacencyList.get(x).size();
+					numContained = x;
+				}
+			}
+			if(numContained == -1){
+				System.out.println("Something wrong in GreedyRemove");
+			}
+			removeNode(numContained);
+			removedNums[counter] = numContained;
+			numRemove--;
+			counter++;
+		}
+		outputToCNP(removedNums);
+	}
+	public void outputToCNP(int[] removedNodes){
+		for(int i = 0; i<removedNodes.length; i++){
+			System.out.println("Removed "+removedNodes[i] + " Counter: " + i);
+		}
+		System.out.println("");
+	}
 	@Override //Overriding toString()
 	public String toString(){
 		String s = "";
@@ -89,7 +121,6 @@ public class GraphMaker {
 		return s;
 
 	}
-
 	//Getters and Setters
 	public int getNodes() {
 		return nodes;
@@ -129,15 +160,11 @@ public class GraphMaker {
 	public static void main(String[] args) throws FileNotFoundException{
 		GraphMaker graph = getGraph();
 		String s = graph.toString();
-		int w = graph.getOutDegree(4);
-		int x = graph.getInDegree(6);
 		System.out.println(s);
-		System.out.println("Out " + w);
-		System.out.println("In " + x);
-		graph.removeNode(3);
+		graph.greedyRemove();
 		s = graph.toString();
 		System.out.println(s);
-
+		
 	}
 
 
