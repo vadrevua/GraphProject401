@@ -5,11 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GraphMaker {
 	private int nodes, edges, removeNodes;
-	private static boolean[][] adjacencyMatrix;
+	private static ArrayList<ArrayList<Integer>> adjacencyList;
 	private static final String filename = "cnp.in";
 
 	public GraphMaker(){
@@ -18,13 +19,53 @@ public class GraphMaker {
 		this.removeNodes = 0;
 	}
 
-	public GraphMaker(int V, int E, int R) {
+	public GraphMaker(int V, int E, int R) { //Constructor
 		this.nodes = V;
 		this.edges = E;
 		this.removeNodes = R;
-		this.adjacencyMatrix = new boolean[V][V];
+		this.setAdjacencyList(new ArrayList<ArrayList<Integer>>());
 	}
 
+
+	public static GraphMaker getGraph(){
+
+		try { //reading in from file called cnp.in and making Adj. List
+			Scanner scan = new Scanner(new File(filename.trim()));	
+			scan.useDelimiter(" |\\r|\\n");
+			int nodes = Integer.parseInt(scan.next());
+			int edges = Integer.parseInt(scan.next());
+			int removableNodes = Integer.parseInt(scan.next()); 
+			GraphMaker graph = new GraphMaker(nodes, edges, removableNodes);
+			for(int x = 0; x<nodes; x++){
+				getAdjacencyList().add(new ArrayList<Integer>());
+			}
+			while(scan.hasNext()){
+				String line = scan.next();
+				int firstNode = Integer.parseInt(scan.next());
+				int secondNode = Integer.parseInt(scan.next());
+				firstNode -= 1;
+				
+				getAdjacencyList().get(firstNode).add(secondNode);	
+			}
+			return graph;
+		}catch (FileNotFoundException e) {
+			System.out.println("File Not Found");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override //Overriding toString()
+	public String toString(){
+		String s = "";
+		for(int v=0; v<this.nodes; v++){
+            s += v+1 + ": " + GraphMaker.getAdjacencyList().get(v)+"\n";
+        }
+		return s;
+		
+	}
+	
+	//Getters and Setters
 	public int getNodes() {
 		return nodes;
 	}
@@ -48,49 +89,24 @@ public class GraphMaker {
 	public void setRemoveNodes(int removeNodes) {
 		this.removeNodes = removeNodes;
 	}
-
-
-	public static GraphMaker getGraph(){
-
-		try {
-			Scanner scan = new Scanner(new File(filename.trim()));
-			scan.useDelimiter(" |\\r|\\n");
-			int nodes = Integer.parseInt(scan.next());
-			int edges = Integer.parseInt(scan.next());
-			int removableNodes = Integer.parseInt(scan.next()); 
-			GraphMaker graph = new GraphMaker(nodes, edges, removableNodes);
-			while(scan.hasNext()){
-				String line = scan.next();
-				int firstNode = Integer.parseInt(scan.next());
-				int secondNode = Integer.parseInt(scan.next());
-				graph.adjacencyMatrix[firstNode-1][secondNode-1] = true;
-				graph.adjacencyMatrix[secondNode-1][firstNode-1] = true;
-
-			}
-			return graph;
-
-		} catch (FileNotFoundException e) {
-			System.out.println("File Not Found");
-			e.printStackTrace();
-		}
-		return null;
-
-
+	public static ArrayList<ArrayList<Integer>> getAdjacencyList() {
+		return adjacencyList;
 	}
+
+	public static void setAdjacencyList(ArrayList<ArrayList<Integer>> adjacencyList) {
+		GraphMaker.adjacencyList = adjacencyList;
+	}
+	//end getters and setters
+	
+	
+	
+	
 	public static void main(String[] args) throws FileNotFoundException{
 		GraphMaker graph = getGraph();
-		int count = 0;
-		for(int x = 0; x<graph.getNodes(); x++){
-			for(int y = 0; y<graph.getNodes(); y++){
-				count++;
-				System.out.print(graph.adjacencyMatrix[x][y] + " ");
-				if(count%7 == 0){System.out.println("");}
-			}
-		}
-
-		//GraphMaker gm = new GraphMaker();
-
-		//System.out.println();
+		String s = graph.toString();
+		System.out.println(s);
 	}
+
+
 
 }
