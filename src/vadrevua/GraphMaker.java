@@ -36,16 +36,17 @@ public class GraphMaker {
 			int edges = Integer.parseInt(scan.next());
 			int removableNodes = Integer.parseInt(scan.next()); 
 			GraphMaker graph = new GraphMaker(nodes, edges, removableNodes);
-			for(int x = 0; x<nodes; x++){
+			for(int x = 0; x<=nodes; x++){
 				getAdjacencyList().add(new ArrayList<Integer>());
 			}
 			while(scan.hasNext()){
 				String line = scan.next();
 				int firstNode = Integer.parseInt(scan.next());
 				int secondNode = Integer.parseInt(scan.next());
-				firstNode -= 1;
-				
-				getAdjacencyList().get(firstNode).add(secondNode);	
+				firstNode -=1;
+				secondNode -=1;
+				getAdjacencyList().get(firstNode).add(secondNode);
+//				getAdjacencyList().get(secondNode).add(firstNode);
 			}
 			return graph;
 		}catch (FileNotFoundException e) {
@@ -55,16 +56,40 @@ public class GraphMaker {
 		return null;
 	}
 
+	public int getOutDegree(int v){
+		return (adjacencyList.get(v-1)).size();
+	}
+
+	public int getInDegree(int v){
+		int count = 0;
+		for(int x = 0; x < getNodes(); x++){
+			if(adjacencyList.get(x).contains(v)){
+				count++;
+			}
+		}
+		return count;
+	}
+
+	public void removeNode(int x){
+		for(int V = 0; V < getNodes(); V++){
+			if(adjacencyList.get(V).contains(x)){
+			
+			}
+		}
+
+		setNodes(getNodes()-1);
+	}
+
 	@Override //Overriding toString()
 	public String toString(){
 		String s = "";
 		for(int v=0; v<this.nodes; v++){
-            s += v+1 + ": " + GraphMaker.getAdjacencyList().get(v)+"\n";
-        }
+			s += v + " (in text file " + (v+1) +")" + ": " + GraphMaker.getAdjacencyList().get(v)+"\n";
+		}
 		return s;
-		
+
 	}
-	
+
 	//Getters and Setters
 	public int getNodes() {
 		return nodes;
@@ -97,14 +122,22 @@ public class GraphMaker {
 		GraphMaker.adjacencyList = adjacencyList;
 	}
 	//end getters and setters
-	
-	
-	
-	
+
+
+
+
 	public static void main(String[] args) throws FileNotFoundException{
 		GraphMaker graph = getGraph();
 		String s = graph.toString();
+		int w = graph.getOutDegree(4);
+		int x = graph.getInDegree(6);
 		System.out.println(s);
+		System.out.println("Out " + w);
+		System.out.println("In " + x);
+		graph.removeNode(3);
+		s = graph.toString();
+		System.out.println(s);
+
 	}
 
 
