@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GraphMaker {
-	private int nodes, edges, removeNodes;
+	private int nodes, edges;
+	private static int removeNodes;
+	static int count;
+	static String outputString = "";
 	private static ArrayList<ArrayList<Integer>> adjacencyList;
 	private static final String filename = "cnp.in";
 
@@ -48,8 +51,8 @@ public class GraphMaker {
 				firstNode -=1;
 				secondNode -=1;
 				getAdjacencyList().get(firstNode).add(secondNode);
-				getAdjacencyList().get(secondNode).add(firstNode);
-				}
+				//getAdjacencyList().get(secondNode).add(firstNode);
+			}
 			return graph;
 		}catch (FileNotFoundException e) {
 			System.out.println("File Not Found");
@@ -87,8 +90,14 @@ public class GraphMaker {
 
 	public static void dfs(GraphMaker graph){
 		boolean [] visited = new boolean[adjacencyList.size()];
-		graph.greedyRemove();
+		int[] removedNums = graph.greedyRemove();
 		dfs_Actual(adjacencyList, visited, 0);
+		try {
+			outputToCNP(removedNums);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static void dfs_Actual(ArrayList<ArrayList<Integer>> adjList, boolean[] visited, int v){
 		visited[v] = true;
@@ -96,18 +105,24 @@ public class GraphMaker {
 		for(int x : adjacencyList.get(v)){
 			if(!visited[x]){
 				dfs_Actual(adjList, visited, x);
+				if(count < pairWiseConnect(v)){
+				count = pairWiseConnect(v);
+				outputString = ((Integer)count).toString();
+				}
 			}
+
 		}
-		
+
+		System.out.println("Number of Pairwise Connections " + count);
 	}
-	
-	public int pairWiseConnect(int numNodes){
+
+	public static int pairWiseConnect(int numNodes){
 		numNodes = numNodes*(numNodes-1);
 		numNodes = numNodes/2;
 		return numNodes;
 	}
-	
-	public void greedyRemove(){
+
+	public int[] greedyRemove(){
 		int numRemove = this.removeNodes;
 		int[] removedNums = new int[numRemove];
 		int counter = 0;
@@ -128,31 +143,23 @@ public class GraphMaker {
 			numRemove--;
 			counter++;
 		}
-		try {
-			outputToCNP(removedNums);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		return removedNums;
+
+	}
+	public static void outputToCNP(int[] removedNodes) throws FileNotFoundException{
+
+		int newNodes = adjacencyList.size() - 1 - removeNodes;
+		String inForString = "\n";
+		for(int i = 0; i<removedNodes.length; i++){
+			System.out.println("Removed "+removedNodes[i] + " from Graph");
+			inForString += removedNodes[i] + " ";
+		}
+		outputString += inForString;
+		try (PrintStream out = new PrintStream(new FileOutputStream("cnp.out"))) {
+			out.print(outputString);
 		}
 	}
-	public void outputToCNP(int[] removedNodes) throws FileNotFoundException{
 
-//Error must be in//		int newNodes = adjacencyList.size() - 1 - removeNodes;
-//first four lines//		String outputString = "";
-////		String inForString = "\n";
-////		int x = pairWiseConnect(newNodes);
-//		System.out.println("Number of Pairwise Connections " + x);
-//		outputString = "" + x;
-//		for(int i = 0; i<removedNodes.length; i++){
-//			System.out.println("Removed "+removedNodes[i] + " from Graph");
-//			inForString += removedNodes[i] + " ";
-//		}
-//		outputString += inForString;
-//		try (PrintStream out = new PrintStream(new FileOutputStream("cnp.out"))) {
-//		    out.print(outputString);
-//		}
-	}
-	
 	@Override //Overriding toString()
 	public String toString(){
 		String s = "";
@@ -162,8 +169,8 @@ public class GraphMaker {
 		return s;
 
 	}
-	
-	
+
+
 	//Getters and Setters
 	public int getNodes() {
 		return nodes;
@@ -208,7 +215,7 @@ public class GraphMaker {
 		//graph.greedyRemove();
 		//s = graph.toString();
 		//System.out.println(s);
-		
+
 	}
 
 
