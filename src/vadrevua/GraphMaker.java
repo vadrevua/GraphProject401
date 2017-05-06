@@ -83,6 +83,15 @@ public class GraphMaker {
 		}
 	}
 
+	public int DFS(){
+		int x = 0;
+		
+		greedyRemove();
+		
+		return x;
+		
+	}
+	
 	public void greedyRemove(){
 		int numRemove = this.removeNodes;
 		int[] removedNums = new int[numRemove];
@@ -160,10 +169,10 @@ public class GraphMaker {
 	public static void main(String[] args) throws FileNotFoundException{
 		GraphMaker graph = getGraph();
 		String s = graph.toString();
-		System.out.println(s);
-		graph.greedyRemove();
+		//System.out.println(s);
+		//graph.greedyRemove();
 		s = graph.toString();
-		System.out.println(s);
+	//	System.out.println(s);
 		
 	}
 
