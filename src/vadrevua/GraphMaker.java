@@ -3,8 +3,10 @@ package vadrevua;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -83,13 +85,26 @@ public class GraphMaker {
 		}
 	}
 
-	public int DFS(){
-		int x = 0;
+	public static void dfs(GraphMaker graph){
+		boolean [] visited = new boolean[adjacencyList.size()];
+		graph.greedyRemove();
+		dfs_Actual(adjacencyList, visited, 0);
+	}
+	public static void dfs_Actual(ArrayList<ArrayList<Integer>> adjList, boolean[] visited, int v){
+		visited[v] = true;
+		//System.out.print(v + " ");
+		for(int x : adjacencyList.get(v)){
+			if(!visited[x]){
+				dfs_Actual(adjList, visited, x);
+			}
+		}
 		
-		greedyRemove();
-		
-		return x;
-		
+	}
+	
+	public int pairWiseConnect(int numNodes){
+		numNodes = numNodes*(numNodes-1);
+		numNodes = numNodes/2;
+		return numNodes;
 	}
 	
 	public void greedyRemove(){
@@ -113,14 +128,31 @@ public class GraphMaker {
 			numRemove--;
 			counter++;
 		}
-		outputToCNP(removedNums);
-	}
-	public void outputToCNP(int[] removedNodes){
-		for(int i = 0; i<removedNodes.length; i++){
-			System.out.println("Removed "+removedNodes[i] + " Counter: " + i);
+		try {
+			outputToCNP(removedNums);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		System.out.println("");
 	}
+	public void outputToCNP(int[] removedNodes) throws FileNotFoundException{
+
+//Error must be in//		int newNodes = adjacencyList.size() - 1 - removeNodes;
+//first four lines//		String outputString = "";
+////		String inForString = "\n";
+////		int x = pairWiseConnect(newNodes);
+//		System.out.println("Number of Pairwise Connections " + x);
+//		outputString = "" + x;
+//		for(int i = 0; i<removedNodes.length; i++){
+//			System.out.println("Removed "+removedNodes[i] + " from Graph");
+//			inForString += removedNodes[i] + " ";
+//		}
+//		outputString += inForString;
+//		try (PrintStream out = new PrintStream(new FileOutputStream("cnp.out"))) {
+//		    out.print(outputString);
+//		}
+	}
+	
 	@Override //Overriding toString()
 	public String toString(){
 		String s = "";
@@ -130,6 +162,8 @@ public class GraphMaker {
 		return s;
 
 	}
+	
+	
 	//Getters and Setters
 	public int getNodes() {
 		return nodes;
@@ -169,10 +203,11 @@ public class GraphMaker {
 	public static void main(String[] args) throws FileNotFoundException{
 		GraphMaker graph = getGraph();
 		String s = graph.toString();
+		dfs(graph);
 		//System.out.println(s);
 		//graph.greedyRemove();
-		s = graph.toString();
-	//	System.out.println(s);
+		//s = graph.toString();
+		//System.out.println(s);
 		
 	}
 
